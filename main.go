@@ -1,4 +1,4 @@
-package handler
+package main
 
 import (
 	"net/http"
@@ -25,31 +25,29 @@ type Stats struct {
 
 var stats = Stats{EmailLimit: 10, EmailWarmUp: true}
 
-// Handler function for the Go app, used in Vercel
-func Handler(w http.ResponseWriter, r *http.Request) {
+func main() {
+	// Use Gin router
 	router := gin.Default()
 
-	// **Enable CORS with specific frontend origin**
+	// Enable CORS
 	config := cors.Config{
-		AllowOrigins:     []string{"https://aws-ses-api-fgq1.vercel.app"}, // Replace with your frontend URL
+		AllowOrigins:     []string{"https://aws-ses-api-fgq1.vercel.app"}, // Update with your frontend URL
 		AllowMethods:     []string{"GET", "POST", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
 		AllowCredentials: true,
 	}
 	router.Use(cors.New(config))
 
-	// Root route for testing
+	// Routes
 	router.GET("/", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"message": "Welcome to the mock SES API!"})
 	})
-
-	// Routes
 	router.POST("/sendEmail", sendEmail)
 	router.GET("/stats", getStats)
 	router.GET("/healthcheck", healthCheck)
 
-	// Forward the request to Gin
-	router.ServeHTTP(w, r)
+	// Start server on port 8080
+	router.Run(":8080")
 }
 
 // sendEmail handles the sending of email (mock behavior)
