@@ -1,7 +1,9 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
+	"os"
 	"sync"
 
 	"github.com/gin-contrib/cors"
@@ -46,8 +48,13 @@ func main() {
 	router.GET("/stats", getStats)
 	router.GET("/healthcheck", healthCheck)
 
-	// Start server on port 8080
-	router.Run(":8080")
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+
+	fmt.Println("Server starting on port:", port)
+	router.Run(":" + port)
 }
 
 // sendEmail handles the sending of email (mock behavior)
